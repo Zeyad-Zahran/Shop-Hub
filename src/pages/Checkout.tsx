@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, CreditCard, Truck, Shield } from 'lucide-react';
@@ -91,23 +92,25 @@ const Checkout = () => {
       orderDate: new Date().toISOString()
     };
 
-    const formDataToSend = new FormData();
-    formDataToSend.append('name', `${formData.firstName} ${formData.lastName}`);
-    formDataToSend.append('email', formData.email);
-    formDataToSend.append('phone', formData.phone);
-    formDataToSend.append('shippingAddress', `${formData.address}, ${formData.city}, ${formData.state} ${formData.zipCode}, ${formData.country}`);
-    formDataToSend.append('products', JSON.stringify(orderData.products, null, 2));
-    formDataToSend.append('subtotal', `$${orderData.subtotal.toFixed(2)}`);
-    formDataToSend.append('tax', `$${orderData.tax.toFixed(2)}`);
-    formDataToSend.append('totalPrice', `$${orderData.total.toFixed(2)}`);
-    formDataToSend.append('totalItems', orderData.totalItems.toString());
-    formDataToSend.append('notes', formData.notes || 'No additional notes');
-    formDataToSend.append('orderDate', orderData.orderDate);
-
     try {
       const response = await fetch('https://formspree.io/f/mgvewbgd', {
         method: 'POST',
-        body: formDataToSend,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: `${formData.firstName} ${formData.lastName}`,
+          email: formData.email,
+          phone: formData.phone,
+          shippingAddress: `${formData.address}, ${formData.city}, ${formData.state} ${formData.zipCode}, ${formData.country}`,
+          products: JSON.stringify(orderData.products, null, 2),
+          subtotal: `$${orderData.subtotal.toFixed(2)}`,
+          tax: `$${orderData.tax.toFixed(2)}`,
+          totalPrice: `$${orderData.total.toFixed(2)}`,
+          totalItems: orderData.totalItems,
+          notes: formData.notes || 'No additional notes',
+          orderDate: orderData.orderDate
+        }),
       });
 
       if (response.ok) {
